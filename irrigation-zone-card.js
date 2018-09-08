@@ -6,7 +6,7 @@ class IrrigationZoneCard extends HTMLElement {
       const link = document.createElement('link');
       link.type = 'text/css';
       link.rel = 'stylesheet';
-      link.href = '/local/custom_ui/css/irrigation-zone-card.css';
+      link.href = '/local/custom_ui/irrigation-zone/irrigation-zone-card.css';
       card.appendChild(link);
       this.content = document.createElement('div');
       this.content.className = 'card';
@@ -14,46 +14,59 @@ class IrrigationZoneCard extends HTMLElement {
       this.appendChild(card);
     }
 
-    //const entityId = this.config.entity;
+    const zone_title = this._config.zone_title;
+    const next_water = new Date(hass.states[this._config.next_water].state);
+    const last_water = new Date(hass.states[this._config.last_water].state);
+    const zone_status = hass.states[this._config.zone_status].state;
+    const moisture_level = hass.states[this._config.moisture_level].state;
+    const temperature = hass.states[this._config.temperature].state;
+    const light_level = hass.states[this._config.light_level].state;
 
-    const cardtitle = hass.states[this.config.card_title].state;
+    var day_format = { weekday: 'long', month: 'long', day: 'numeric' };
+    var time_format = {hour12: "false", hour: "2-digit", minute: "2-digit"};
+    var next_water_day = next_water.toLocaleDateString([], day_format);
+    var next_water_time = next_water.toLocaleTimeString([], time_format);
+    var last_water_day = last_water.toLocaleDateString([], day_format);
+    var last_water_time = last_water.toLocaleTimeString([], time_format);
+
+    //const cardtitle = hass.states[this.config.card_title].state;
 
     this.content.innerHTML = `
       <!-- Main Container -->
-      <div class="container" style="background: none, url(/local/custom_ui/images/seedlings.jpg) no-repeat; background-size: contain;"> 
+      <div class="container" style="background: none, url(/local/custom_ui/irrigation-zone/seedlings.jpg) no-repeat; background-size: contain;"> 
         <!-- Zone Title Section -->
         <section class="irrigation_title">
-          <h2 class="irrigation_header">${cardtitle}</h2>
+          <h2 class="irrigation_header">${zone_title}</h2>
         </section>
         <!-- Zone Schedule Gallery Section -->
         <div class="schedule">
           <div class="zone_time">
             <h1 class="time_title">Next Watering Time</h1>
-            <h4>Wednesday 25th March</h4>
-            <h4>8:00pm</h4>
+            <h4>${next_water_day}</h4>
+            <h4>${next_water_time}</h4>
           </div>
           <div class="zone_time" style="margin-right: 0px;">
             <h1 class="time_title">Last Watering Time</h1>
-            <h4>Tuesday 24th March</h4>
-            <h4>8:00pm</h4>
+            <h4>${last_water_day}</h4>
+            <h4>${last_water_time}</h4>
           </div>
         </div>
         <div class="states">
           <div class="attribute">
             <h1 class="state_title">Status</h1>
-            <h4>On</h4>
+            <h4>${zone_status}</h4>
           </div>
           <div class="attribute">
-            <h1 class="state_title">Soil Level</h1>
-            <h4>50 %</h4>
+            <h1 class="state_title">Water Level</h1>
+            <h4>${moisture_level}%</h4>
           </div>
           <div class="attribute">
             <h1 class="state_title">Temperature</h1>
-            <h4>20.0 c</h4>
+            <h4>${temperature}°C</h4>
           </div>
           <div class="attribute">
             <h1 class="state_title">Light Level</h1>
-            <h4>30 lux</h4>
+            <h4>${light_level}lx</h4>
           </div>
           <div class="attribute" style="margin-right: 0px;">
             <h1 class="state_title">Settings</h1>
@@ -62,38 +75,10 @@ class IrrigationZoneCard extends HTMLElement {
         </div>
       </div>`;
 
-
-
-//    const getUnit = function(measure) {
-//      const lengthUnit = hass.config.core.unit_system.length;
-//      switch (measure) {
-//        case 'air_pressure':
-//          return lengthUnit === 'km' ? 'hPa' : 'mbar';
-//        case 'length':
-//          return lengthUnit;
-//        case 'precipitation':
-//          return lengthUnit === 'km' ? 'mm' : 'in';
-//        default:
-//          return hass.config.core.unit_system[measure] || '';
-//      }
-//    };
-
-//    let title = "";
-//    const config = this._config;
-//    title = config.title;
-//    const last_run = hass.states[this.config.entity_last_run].state;
-//    const current_status = hass.states[this.config.entity_current_status].state;
-//    const manual activation = hass.states[this.config.entity_manual_activation].state;
-//    const moisture_level = Math.round(hass.states[this.config.entity_moisture_level].state);
-//    const light_level = Math.round(hass.states[this.config.entity_light_level].state);
-//    const temperature = Math.round(hass.states[this.config.entity_temperature].state);
-//    const zonetitle = hass.states[this.config.entity_zonetitle].state;
-//    const currentstate = hass.states[this.config.entity_currentstate].state;
-
   }
 
   setConfig(config) {
-    const cardConfig = Object.assign({}, config);
+    this._config = config;
     //const cardtitle = config.title;
 //    const next_schedule = cardConfig.entity_next_schedule;
     
